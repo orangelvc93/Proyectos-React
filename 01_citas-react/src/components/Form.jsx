@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import Error from "./Error";
 
-const Form = () => {
+const Form = ({ pacientes, setPacientes, paciente, setPaciente }) => {
 	const [nombre, setNombre] = useState("");
 	const [propietario, setPropietario] = useState("");
 	const [email, setEmail] = useState("");
@@ -8,6 +9,23 @@ const Form = () => {
 	const [sintomas, setSintomas] = useState("");
 
 	const [error, setError] = useState(false);
+
+	useEffect(() => {
+		if (Object.keys(paciente).length > 0) {
+			const { nombre, propietario, email, fecha, sintomas } = paciente;
+			setNombre(nombre);
+			setPropietario(propietario);
+			setEmail(email);
+			setFecha(fecha);
+			setSintomas(sintomas);
+		}
+	}, [paciente]);
+
+	const generaId = () => {
+		const random = Math.random().toString(36).slice(2);
+		const fecha = Date.now().toString(36);
+		return random + fecha;
+	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -17,6 +35,35 @@ const Form = () => {
 			return;
 		}
 		setError(false);
+
+		const objetoPaciente = {
+			nombre,
+			propietario,
+			email,
+			fecha,
+			sintomas,
+		};
+
+		if (paciente.id) {
+			//Editando el registro
+			objetoPaciente.id = paciente.id;
+			const pacientesActualizados = pacientes.map((pacienteState) =>
+				pacienteState.id === objetoPaciente.id ? objetoPaciente : pacienteState
+			);
+
+			setPacientes(pacientesActualizados);
+			setPaciente({});
+		} else {
+			//Nuevo Registro
+			objetoPaciente.id = generaId();
+			setPacientes([...pacientes, objetoPaciente]);
+		}
+
+		setNombre("");
+		setPropietario("");
+		setEmail("");
+		setFecha("");
+		setSintomas("");
 	};
 
 	return (
@@ -33,11 +80,9 @@ const Form = () => {
 				className="bg-white shadow-md rounded-lg py-10 px-5 mb-10 mx-5"
 			>
 				{error && (
-					<div>
-						<p className="bg-red-800 text-white text-center p-3 uppercase font-bold mb-3 rounded-md">
-							Todos los campos son obligatorios
-						</p>
-					</div>
+					<Error>
+						<p>Todos los campos son obligatorios</p>
+					</Error>
 				)}
 
 				<div className="mb-5">
@@ -125,7 +170,7 @@ const Form = () => {
 				<input
 					type="submit"
 					className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-all"
-					value="Agregar Paciente"
+					value={paciente.id ? "Editar paciente" : "Agregar Paciente"}
 				/>
 			</form>
 		</div>
