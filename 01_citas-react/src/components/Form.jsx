@@ -2,14 +2,17 @@ import { useState, useEffect } from "react";
 import Error from "./Error";
 
 const Form = ({ pacientes, setPacientes, paciente, setPaciente }) => {
+	/* #1-- REGISTRAMOS LOS ESTADOS DE LOS INPUTS  ===========================*/
 	const [nombre, setNombre] = useState("");
 	const [propietario, setPropietario] = useState("");
 	const [email, setEmail] = useState("");
 	const [fecha, setFecha] = useState("");
 	const [sintomas, setSintomas] = useState("");
 
+	/* #4-- CREAMOS STATE PARA EL MSJ DE ERROR */
 	const [error, setError] = useState(false);
 
+	/* #9.5  Llenamos los campos del formulario al editar un paciente*/
 	useEffect(() => {
 		if (Object.keys(paciente).length > 0) {
 			const { nombre, propietario, email, fecha, sintomas } = paciente;
@@ -21,21 +24,26 @@ const Form = ({ pacientes, setPacientes, paciente, setPaciente }) => {
 		}
 	}, [paciente]);
 
+	/* #7 GENERAMOS UN ID =========================== */
 	const generaId = () => {
 		const random = Math.random().toString(36).slice(2);
 		const fecha = Date.now().toString(36);
 		return random + fecha;
 	};
 
+	/* #2-- VALIDAMOS EL FORMULARIO =========================== */
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
+		/* #3-- COMPROBAMOS SI LOS CAMPOS ESTÁN VACÍOS =================*/
 		if ([nombre, propietario, email, fecha, sintomas].includes("")) {
+			/* #4.1-- CAMBIAMOS EL STATE DEL ERROR A TRUE */
 			setError(true);
 			return;
 		}
 		setError(false);
 
+		/* #5.2-- CREAMOS EL OBJETO DE PACIENTES =========================== */
 		const objetoPaciente = {
 			nombre,
 			propietario,
@@ -44,6 +52,7 @@ const Form = ({ pacientes, setPacientes, paciente, setPaciente }) => {
 			sintomas,
 		};
 
+		/* #9.7 Detectamos registros nuevos o si estamos editando  */
 		if (paciente.id) {
 			//Editando el registro
 			objetoPaciente.id = paciente.id;
@@ -54,11 +63,11 @@ const Form = ({ pacientes, setPacientes, paciente, setPaciente }) => {
 			setPacientes(pacientesActualizados);
 			setPaciente({});
 		} else {
-			//Nuevo Registro
+			/* #5.3-- CREAMOS UN NUEVO PACIENTE =========================== */
 			objetoPaciente.id = generaId();
 			setPacientes([...pacientes, objetoPaciente]);
 		}
-
+		/* #5.4-- REINICIAMOS EL FORMULARIO */
 		setNombre("");
 		setPropietario("");
 		setEmail("");
@@ -79,6 +88,7 @@ const Form = ({ pacientes, setPacientes, paciente, setPaciente }) => {
 				onSubmit={handleSubmit}
 				className="bg-white shadow-md rounded-lg py-10 px-5 mb-10 mx-5"
 			>
+				{/* #4.2-- CREAMOS MENSAJE ERROR =============================== */}
 				{error && (
 					<Error>
 						<p>Todos los campos son obligatorios</p>
@@ -169,7 +179,8 @@ const Form = ({ pacientes, setPacientes, paciente, setPaciente }) => {
 
 				<input
 					type="submit"
-					className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-all"
+					className="bg-indigo-600 w-full p-3 rounded-md text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-all"
+					/* #9.6 Mostramos de forma condicional el texto del botón de formulario  */
 					value={paciente.id ? "Editar paciente" : "Agregar Paciente"}
 				/>
 			</form>
