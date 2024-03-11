@@ -32,24 +32,27 @@ const diccionarioIconos = {
 };
 
 /* #10.5 Creamos el componente para crear el gasto */
-const Gasto = ({ gasto, setGastoEditar }) => {
+const Gasto = ({ gasto, setGastoEditar, eliminarGasto }) => {
 	const { categoria, nombre, cantidad, id, fecha } = gasto;
 
 	/* #13.2 Creamos los efectos al inicio y el final del swipe */
 	const leadingActions = () => (
 		<LeadingActions>
-			{/* $14.3 le pasamos la informacion de gastos a setGastoEditar */}
+			{/* #14.3 le pasamos la informacion de gastos a setGastoEditar */}
 			<SwipeAction onClick={() => setGastoEditar(gasto)}>Editar..</SwipeAction>
 		</LeadingActions>
 	);
 
 	const trailingActions = () => (
+		/* $14.4 Configuramos el lado de eliminar */
 		<TrailingActions>
 			<SwipeAction
+				/* #16.6 Le pasamos un prop por defecto al Swipe para mejorar el efecto de desaparecer */
 				destructive={true}
-				onClick={() => console.info("swipe action triggered")}
+				/* #16.3 Le agregamos le función al click */
+				onClick={() => eliminarGasto(id)}
 			>
-				Delete
+				Eliminar
 			</SwipeAction>
 		</TrailingActions>
 	);

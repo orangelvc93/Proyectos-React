@@ -3,10 +3,13 @@ import NuevoPresupuesto from "./NuevoPresupuesto";
 
 const Header = ({
 	gastos,
+	setGastos,
 	presupuesto,
 	setPresupuesto,
 	isValidPresupuesto,
 	setIsValidPresupuesto,
+	setGastosFiltrados,
+	setFiltro,
 }) => {
 	return (
 		<header>
@@ -20,6 +23,12 @@ const Header = ({
 					presupuesto={presupuesto}
 					/* #12.1 terminamos de pasar el prop para usarlo en este componente */
 					gastos={gastos}
+					/* #22.1 Pasamos setGastos y setPresupuestos */
+					setGastos={setGastos}
+					setPresupuesto={setPresupuesto}
+					setIsValidPresupuesto={setIsValidPresupuesto}
+					setGastosFiltrados={setGastosFiltrados}
+					setFiltro={setFiltro}
 				/>
 			) : (
 				<NuevoPresupuesto

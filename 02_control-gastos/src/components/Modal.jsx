@@ -10,6 +10,7 @@ const Modal = ({
 	setAnimarModal,
 	guardarGasto,
 	gastoEditar,
+	setGastoEditar,
 }) => {
 	/* #8.3 Creamos un State para el mensaje de error */
 	const [mensaje, setMensaje] = useState("");
@@ -17,13 +18,23 @@ const Modal = ({
 	const [nombre, setNombre] = useState("");
 	const [cantidad, setCantidad] = useState("");
 	const [categoria, setCategoria] = useState("");
+	/* #15.7 creamos un hook para guardar la fecha al momento de editar  */
+	const [fecha, setFecha] = useState("");
 
-	/* #14.7 usamos useEffect para que se ejecute cuando el componente esté listo */
+	/* #15.2 Para identificar el gasto, debemos crear un id */
+	const [id, setId] = useState("");
+
+	/* #14.7 usamos useEffect para que se ejecute cuando el componente esté listo
+	guardamos los campos al momento de editar*/
 	useEffect(() => {
 		if (Object.keys(gastoEditar).length > 0) {
 			setNombre(gastoEditar.nombre);
 			setCantidad(gastoEditar.cantidad);
 			setCategoria(gastoEditar.categoria);
+			/* #15.3 Pasamos el id */
+			setId(gastoEditar.id);
+			/* #15.8 Pasamos la fecha */
+			setFecha(gastoEditar.fecha);
 		}
 	}, []);
 
@@ -31,6 +42,9 @@ const Modal = ({
 	const ocultarModal = () => {
 		/* #5.8 usamos el prop aquí  */
 		setAnimarModal(false);
+
+		/* #16.7 Le pasamos como un objeto vacío para limpiarlo */
+		setGastoEditar({});
 
 		/* #6.5 Agregamos un setTimeout para que primero se cierre la animación y luego cerramos el modal  */
 		setTimeout(() => {
@@ -51,8 +65,11 @@ const Modal = ({
 			return;
 		}
 
-		/* #9.3 Agregamos los valores a la función como un objeto */
-		guardarGasto({ nombre, cantidad, categoria });
+		/* #9.3 Agregamos los valores a la función como un objeto 
+		#15.4 Agregamos el id al objeto
+		#15.9 Agregamos la fecha al objeto
+		*/
+		guardarGasto({ nombre, cantidad, categoria, id, fecha });
 	};
 
 	return (
@@ -72,7 +89,8 @@ const Modal = ({
 				onSubmit={handleSubmit}
 				className={`formulario ${animarModal ? "animar" : " "}`}
 			>
-				<legend>Nuevo Gasto</legend>
+				{/* #15 Creamos la condicional para que cambie dependiendo si editamos o creamos un nuevo gasto */}
+				<legend>{gastoEditar.nombre ? "Editar Gasto" : "Nuevo Gasto"}</legend>
 
 				{/* #8.4 Agregamos el mensaje de error al formulario */}
 				{mensaje && <Mensaje tipo="error">{mensaje}</Mensaje>}
@@ -123,7 +141,8 @@ const Modal = ({
 
 				<input
 					type="submit"
-					value="Añadir Gasto"
+					/* #15.1 Creamos la misma validación para el botón */
+					value={gastoEditar.nombre ? "Guardar Cambios" : "Añadir Gasto"}
 				/>
 			</form>
 		</div>
