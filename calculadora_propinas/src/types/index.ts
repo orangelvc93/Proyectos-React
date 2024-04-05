@@ -1,5 +1,9 @@
 export type MenuItem ={
-    id: number,
+    id: number, 
     name: string,
-    price: number,
+    price: number
+}
+
+export type OrderItem = MenuItem & {
+    quantity: number
 }
