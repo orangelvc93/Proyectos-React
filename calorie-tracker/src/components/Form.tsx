@@ -1,22 +1,69 @@
-import { useState } from "react";
-import { Categories } from "../data/categories";
+import { useState, ChangeEvent, FormEvent, Dispatch, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
-const Form = () => {
-	const [activity, setActivity] = useState({
-		category: 1,
-		name: "",
-		calories: 0,
-	});
+import { Activity } from "../types";
+import { categories } from "../data/categories";
+import { ActivityActions, ActivityState } from "../reducers/activity-reducer";
 
-	const handleChange = (e) => {
+type FromProps = {
+	dispatch: Dispatch<ActivityActions>;
+	state: ActivityState;
+};
+
+const initialState: Activity = {
+	id: uuidv4(),
+	category: 1,
+	name: "",
+	calories: 0,
+};
+
+const Form = ({ dispatch, state }: FromProps) => {
+	const [activity, setActivity] = useState<Activity>(initialState);
+
+	useEffect(() => {
+		if (state.activeId) {
+			const selectedActivity = state.activities.filter(
+				(stateActivity) => stateActivity.id === state.activeId
+			)[0];
+			setActivity(selectedActivity);
+		}
+	}, [state.activeId]);
+
+	const handleChange = (
+		e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLInputElement>
+	) => {
+		const isNumberField = ["category", "calories"].includes(e.target.id);
+
+		/* console.log(isNumberField); */
+
 		setActivity({
 			...activity,
-			[e.target.id]: e.target.value,
+			[e.target.id]: isNumberField ? +e.target.value : e.target.value,
+		});
+	};
+
+	const isValidActivity = () => {
+		const { name, calories } = activity;
+		/* console.log(name.trim() !== "" && calories > 0); */
+		return name.trim() !== "" && calories > 0;
+	};
+
+	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		dispatch({ type: "save-activity", payload: { newActivity: activity } });
+
+		setActivity({
+			...initialState,
+			id: uuidv4(),
 		});
 	};
 
 	return (
-		<form className="bg-white shadow rounded-lg p-10 space-y-5">
+		<form
+			className="bg-white shadow rounded-lg p-10 space-y-5"
+			onSubmit={handleSubmit}
+		>
 			<div className="grid grid-cols-1 gap-3">
 				<label
 					htmlFor="category"
@@ -30,7 +77,7 @@ const Form = () => {
 					onChange={handleChange}
 					className="border border-slate-300 p-2 rounded-lg w-full bg-white focus:outline-lime-900 text-lime-900"
 				>
-					{Categories.map((category) => (
+					{categories.map((category) => (
 						<option
 							key={category.id}
 							value={category.id}
@@ -77,8 +124,9 @@ const Form = () => {
 			</div>
 			<input
 				type="submit"
-				value="Guardar Ejercicio o Guardar Comida"
-				className="bg-gray-800 hover:bg-slate-900 w-full p-2 font-bold uppercase text-white rounded-lg cursor-pointer"
+				value={activity.category === 1 ? "Guardar Comida" : "Guardar Ejercicio"}
+				className="bg-gray-800 hover:bg-slate-900 w-full p-2 font-bold uppercase text-white rounded-lg cursor-pointer disabled:opacity-25"
+				disabled={!isValidActivity()}
 			/>
 		</form>
 	);
